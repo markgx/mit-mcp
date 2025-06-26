@@ -1,14 +1,14 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 
-import { taskService } from '../services/database.js';
+import { mitService } from '../services/database.js';
 
-export function registerTasksTool(server: McpServer) {
+export function registerMitsTool(server: McpServer) {
   server.registerTool(
-    'list_tasks',
+    'list_mits',
     {
-      title: 'List all tasks or tasks for a specific date',
-      description: 'List all tasks or tasks for a specific date',
+      title: 'List all MITs or MITs for a specific date',
+      description: 'List all MITs or MITs for a specific date',
       inputSchema: z.object({
         date: z
           .string()
@@ -18,18 +18,18 @@ export function registerTasksTool(server: McpServer) {
     },
     async ({ date }) => {
       try {
-        const tasks = date
-          ? await taskService.findByDate(date)
-          : await taskService.findAll();
+        const mits = date
+          ? await mitService.findByDate(date)
+          : await mitService.findAll();
         return {
-          content: [{ type: 'text', text: JSON.stringify(tasks, null, 2) }],
+          content: [{ type: 'text', text: JSON.stringify(mits, null, 2) }],
         };
       } catch (error) {
         return {
           content: [
             {
               type: 'text',
-              text: `Error listing tasks: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              text: `Error listing MITs: ${error instanceof Error ? error.message : 'Unknown error'}`,
             },
           ],
           isError: true,
@@ -39,10 +39,10 @@ export function registerTasksTool(server: McpServer) {
   );
 
   server.registerTool(
-    'create_task',
+    'create_mit',
     {
-      title: 'Create a new task',
-      description: 'Create a new task',
+      title: 'Create a new MIT',
+      description: 'Create a new MIT',
       inputSchema: z.object({
         description: z.string().min(1, 'Description is required'),
         order: z.number().int().min(0, 'Order must be non-negative'),
@@ -53,16 +53,16 @@ export function registerTasksTool(server: McpServer) {
     },
     async ({ description, order, date }) => {
       try {
-        const [task] = await taskService.create(description, order, date);
+        const [mit] = await mitService.create(description, order, date);
         return {
-          content: [{ type: 'text', text: JSON.stringify(task, null, 2) }],
+          content: [{ type: 'text', text: JSON.stringify(mit, null, 2) }],
         };
       } catch (error) {
         return {
           content: [
             {
               type: 'text',
-              text: `Error creating task: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              text: `Error creating MIT: ${error instanceof Error ? error.message : 'Unknown error'}`,
             },
           ],
           isError: true,
@@ -72,12 +72,12 @@ export function registerTasksTool(server: McpServer) {
   );
 
   server.registerTool(
-    'update_task',
+    'update_mit',
     {
-      title: 'Update a task',
-      description: 'Update a task',
+      title: 'Update a MIT',
+      description: 'Update a MIT',
       inputSchema: z.object({
-        id: z.string().uuid('Invalid task ID format'),
+        id: z.string().uuid('Invalid MIT ID format'),
         description: z.string().min(1).optional(),
         completed: z.boolean().optional(),
         order: z.number().int().min(0).optional(),
@@ -89,22 +89,22 @@ export function registerTasksTool(server: McpServer) {
     },
     async ({ id, ...data }) => {
       try {
-        const [task] = await taskService.update(id, data);
-        if (!task) {
+        const [mit] = await mitService.update(id, data);
+        if (!mit) {
           return {
-            content: [{ type: 'text', text: `Task with ID ${id} not found` }],
+            content: [{ type: 'text', text: `MIT with ID ${id} not found` }],
             isError: true,
           };
         }
         return {
-          content: [{ type: 'text', text: JSON.stringify(task, null, 2) }],
+          content: [{ type: 'text', text: JSON.stringify(mit, null, 2) }],
         };
       } catch (error) {
         return {
           content: [
             {
               type: 'text',
-              text: `Error updating task: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              text: `Error updating MIT: ${error instanceof Error ? error.message : 'Unknown error'}`,
             },
           ],
           isError: true,
@@ -114,32 +114,32 @@ export function registerTasksTool(server: McpServer) {
   );
 
   server.registerTool(
-    'delete_task',
+    'delete_mit',
     {
-      title: 'Delete a task',
-      description: 'Delete a task',
+      title: 'Delete a MIT',
+      description: 'Delete a MIT',
       inputSchema: z.object({
-        id: z.string().uuid('Invalid task ID format'),
+        id: z.string().uuid('Invalid MIT ID format'),
       }).shape,
     },
     async ({ id }) => {
       try {
-        const [task] = await taskService.delete(id);
-        if (!task) {
+        const [mit] = await mitService.delete(id);
+        if (!mit) {
           return {
-            content: [{ type: 'text', text: `Task with ID ${id} not found` }],
+            content: [{ type: 'text', text: `MIT with ID ${id} not found` }],
             isError: true,
           };
         }
         return {
-          content: [{ type: 'text', text: `Deleted task: ${task.id}` }],
+          content: [{ type: 'text', text: `Deleted MIT: ${mit.id}` }],
         };
       } catch (error) {
         return {
           content: [
             {
               type: 'text',
-              text: `Error deleting task: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              text: `Error deleting MIT: ${error instanceof Error ? error.message : 'Unknown error'}`,
             },
           ],
           isError: true,

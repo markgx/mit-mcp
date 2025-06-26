@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 import { sql } from 'drizzle-orm';
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
-export const tasks = sqliteTable('tasks', {
+export const mits = sqliteTable('mits', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => randomUUID()),
@@ -20,5 +20,5 @@ export const tasks = sqliteTable('tasks', {
     .$onUpdate(() => new Date().toISOString()),
 });
 
-export type Task = typeof tasks.$inferSelect;
-export type NewTask = typeof tasks.$inferInsert;
+export type Mit = typeof mits.$inferSelect;
+export type NewMit = typeof mits.$inferInsert;

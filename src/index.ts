@@ -4,7 +4,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
 import { closeDatabase, initializeDatabase } from './db/index.js';
-import { registerTasksTool } from './tools/tasks.js';
+import { registerMitsTool } from './tools/mits.js';
 
 /**
  * Create a new MCP server instance with full capabilities
@@ -36,7 +36,7 @@ process.on('uncaughtException', (error: Error) => {
 });
 
 try {
-  registerTasksTool(server);
+  registerMitsTool(server);
   logMessage('info', 'Successfully registered all tools');
 } catch (error) {
   logMessage(
