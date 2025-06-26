@@ -1,24 +1,9 @@
 #!/usr/bin/env node
 
-/**
- * MCP Server Starter Template
- *
- * This is a reference implementation of a Model Context Protocol (MCP) server.
- * It demonstrates best practices for:
- * - Server initialization and configuration
- * - Tool registration and management
- * - Error handling and logging
- * - Resource cleanup
- *
- * For more information about MCP, visit:
- * https://modelcontextprotocol.io
- */
-
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
 import { closeDatabase, initializeDatabase } from './db/index.js';
-import { registerCalculatorTool } from './tools/calculator.js';
 import { registerTasksTool } from './tools/tasks.js';
 
 /**
@@ -50,9 +35,7 @@ process.on('uncaughtException', (error: Error) => {
   console.error('Server error:', error);
 });
 
-// Register example tools
 try {
-  registerCalculatorTool(server);
   registerTasksTool(server);
   logMessage('info', 'Successfully registered all tools');
 } catch (error) {
