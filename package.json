@@ -17,7 +17,7 @@
   "author": "Mark Guerra <mark@markgx.dev>",
   "license": "MIT",
   "scripts": {
-    "bundle": "rimraf dist && esbuild --outdir=dist --sourcemap --bundle --platform=node --target=node20.10.0 --format=esm ./src/index.ts",
+    "bundle": "rimraf dist && esbuild --outdir=dist --sourcemap --bundle --platform=node --target=node20.10.0 --format=esm --external:better-sqlite3 ./src/index.ts",
     "compile": "tsc",
     "compile:watch": "tsc -w",
     "dev": "nodemon --watch src --watch test --ext ts,json --exec 'npm run bundle && npm run start'",
@@ -28,16 +28,21 @@
     "lint": "eslint . --fix",
     "lint:check": "eslint .",
     "start": "node --enable-source-maps ./dist/index.js",
-    "test": "jest --runInBand ."
+    "test": "jest --runInBand .",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@jest/globals": "30.0.1",
     "@tsconfig/node22": "^22.0.2",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "29.5.14",
     "@types/node": "^24.0.4",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
+    "drizzle-kit": "^0.31.2",
     "esbuild": "^0.25.5",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^9.1.0",
@@ -53,6 +58,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.13.1",
+    "better-sqlite3": "^12.1.1",
+    "drizzle-orm": "^0.44.2",
     "zod": "^3.25.67"
   }
 }

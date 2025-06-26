@@ -175,6 +175,9 @@ export default [
       '*.d.ts',
       'bundle/**',
       '.yarn/**',
+      'drizzle.config.ts',
+      'drizzle/**',
+      'data.db',
     ],
   },
 

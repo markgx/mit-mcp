@@ -37,10 +37,13 @@ const CalculatorSchema = z.object({
  * @throws Will not throw - all errors are handled and returned in the response
  */
 export function registerCalculatorTool(server: McpServer) {
-  server.tool(
+  server.registerTool(
     'calculate',
-    'Perform basic arithmetic operations',
-    CalculatorSchema.shape,
+    {
+      title: 'Perform basic arithmetic operations',
+      description: 'Perform basic arithmetic operations',
+      inputSchema: CalculatorSchema.shape,
+    },
     async params => {
       try {
         let result: number;

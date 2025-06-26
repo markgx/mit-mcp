@@ -17,7 +17,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
+import { closeDatabase, initializeDatabase } from './db/index.js';
 import { registerCalculatorTool } from './tools/calculator.js';
+import { registerTasksTool } from './tools/tasks.js';
 
 /**
  * Create a new MCP server instance with full capabilities
@@ -51,6 +53,7 @@ process.on('uncaughtException', (error: Error) => {
 // Register example tools
 try {
   registerCalculatorTool(server);
+  registerTasksTool(server);
   logMessage('info', 'Successfully registered all tools');
 } catch (error) {
   logMessage(
@@ -66,6 +69,7 @@ try {
 async function cleanup() {
   try {
     await server.close();
+    closeDatabase();
     logMessage('info', 'Server shutdown completed');
   } catch (error) {
     logMessage(
@@ -86,6 +90,11 @@ process.on('SIGINT', cleanup);
  */
 async function main() {
   try {
+    // Initialize database and run migrations
+    logMessage('info', 'Initializing database...');
+    await initializeDatabase();
+    logMessage('info', 'Database initialized successfully');
+
     // Set up communication with the MCP host using stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);

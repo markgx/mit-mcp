@@ -46,3 +46,8 @@ bundle/
 
 # Project specific
 TODO
+
+# Database files
+data.db
+data.db-journal
+drizzle/
