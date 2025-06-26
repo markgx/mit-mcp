@@ -7,8 +7,8 @@ export function registerMitsTool(server: McpServer) {
   server.registerTool(
     'list_mits',
     {
-      title: 'List all MITs or MITs for a specific date',
-      description: 'List all MITs or MITs for a specific date',
+      title: 'List MITs for today or a specific date',
+      description: 'List MITs for today or a specific date',
       inputSchema: z.object({
         date: z
           .string()
@@ -18,9 +18,9 @@ export function registerMitsTool(server: McpServer) {
     },
     async ({ date }) => {
       try {
-        const mits = date
-          ? await mitService.findByDate(date)
-          : await mitService.findAll();
+        // If no date provided, use today's date
+        const targetDate = date || new Date().toISOString().split('T')[0];
+        const mits = await mitService.findByDate(targetDate);
         return {
           content: [{ type: 'text', text: JSON.stringify(mits, null, 2) }],
         };
@@ -45,15 +45,18 @@ export function registerMitsTool(server: McpServer) {
       description: 'Create a new MIT',
       inputSchema: z.object({
         description: z.string().min(1, 'Description is required'),
-        order: z.number().int().min(0, 'Order must be non-negative'),
+        order: z.number().int().min(1, 'Order must be at least 1').optional(),
         date: z
           .string()
-          .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+          .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+          .optional(),
       }).shape,
     },
     async ({ description, order, date }) => {
       try {
-        const [mit] = await mitService.create(description, order, date);
+        // If no date provided, use today's date
+        const targetDate = date || new Date().toISOString().split('T')[0];
+        const [mit] = await mitService.create(description, order, targetDate);
         return {
           content: [{ type: 'text', text: JSON.stringify(mit, null, 2) }],
         };

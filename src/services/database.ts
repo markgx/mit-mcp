@@ -7,10 +7,25 @@ import type { Mit, NewMit } from '../db/schema.js';
 export const mitService = {
   create: async (
     description: string,
-    order: number,
+    order: number | undefined,
     date: string,
   ): Promise<Mit[]> => {
-    return db.insert(mits).values({ description, order, date }).returning();
+    // If order is not provided, calculate the next sequential number
+    let finalOrder = order;
+    if (finalOrder === undefined) {
+      const existingMits = await db
+        .select()
+        .from(mits)
+        .where(eq(mits.date, date))
+        .orderBy(mits.order);
+      
+      // Find the highest order number and add 1, or start with 1
+      finalOrder = existingMits.length > 0 
+        ? Math.max(...existingMits.map(m => m.order)) + 1 
+        : 1;
+    }
+    
+    return db.insert(mits).values({ description, order: finalOrder, date }).returning();
   },
 
   findAll: async (): Promise<Mit[]> => {
