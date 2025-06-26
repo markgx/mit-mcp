@@ -1,0 +1,48 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+*.log
+
+# TypeScript
+dist/
+*.tsbuildinfo
+*.js.map
+
+# Testing
+coverage/
+*.lcov
+.nyc_output
+
+# Build outputs
+bundle/
+
+# Environment files
+.env
+.env.*
+.envrc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Cache
+.cache
+.eslintcache
+.parcel-cache
+*.tgz
+
+# npm/yarn
+.npm
+.yarn-integrity
+.yarn/
+
+# Project specific
+TODO
