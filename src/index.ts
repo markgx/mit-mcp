@@ -5,13 +5,14 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import { closeDatabase, initializeDatabase } from './db/index.js';
 import { registerMitsTool } from './tools/mits.js';
+import { version } from './version.js';
 
 /**
  * Create a new MCP server instance with full capabilities
  */
 const server = new McpServer({
-  name: 'mcp-server-starter',
-  version: '0.1.0',
+  name: 'mit-mcp',
+  version: version,
   capabilities: {
     tools: {},
     resources: {},
