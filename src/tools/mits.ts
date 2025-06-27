@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 
-import { mitService } from '../services/database.js';
+import { mitService } from '../services/mitService.js';
 
 export function registerMitsTool(server: McpServer) {
   server.registerTool(

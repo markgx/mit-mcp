@@ -178,6 +178,7 @@ export default [
       'drizzle.config.ts',
       'drizzle/**',
       'data.db',
+      'vitest.config.ts',
     ],
   },
 
