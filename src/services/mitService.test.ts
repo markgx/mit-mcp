@@ -4,6 +4,14 @@ import type { Mit } from '../db/schema.js';
 
 import { mitService } from './mitService.js';
 
+// Helper functions for dynamic dates
+const getToday = () => new Date().toISOString().split('T')[0];
+const getFutureDate = (daysAhead = 1) => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysAhead);
+  return date.toISOString().split('T')[0];
+};
+
 // Create properly typed mocks
 const mockFrom = vi.fn();
 const mockValues = vi.fn();
@@ -37,6 +45,11 @@ vi.mock('../db/index.js', () => ({
 }));
 
 describe('mitService', () => {
+  // Calculate dates once for all tests
+  const today = getToday();
+  const tomorrow = getFutureDate();
+  const threeDaysAhead = getFutureDate(3);
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.unstubAllEnvs();
@@ -59,7 +72,7 @@ describe('mitService', () => {
         description: 'Test MIT',
         completed: false,
         order: 1,
-        date: '2025-06-27',
+        date: today,
         createdAt: '2025-06-27T00:00:00.000Z',
         updatedAt: '2025-06-27T00:00:00.000Z',
       };
@@ -70,13 +83,13 @@ describe('mitService', () => {
       // Mock the insert operation
       mockReturning.mockResolvedValueOnce([mockMit]);
 
-      const result = await mitService.create('Test MIT', 1, '2025-06-27');
+      const result = await mitService.create('Test MIT', 1, today);
 
       expect(result).toEqual([mockMit]);
       expect(mockValues).toHaveBeenCalledWith({
         description: 'Test MIT',
         order: 1,
-        date: '2025-06-27',
+        date: today,
       });
     });
 
@@ -87,7 +100,7 @@ describe('mitService', () => {
           description: 'MIT 1',
           completed: false,
           order: 1,
-          date: '2025-06-27',
+          date: today,
           createdAt: '2025-06-27T00:00:00.000Z',
           updatedAt: '2025-06-27T00:00:00.000Z',
         },
@@ -96,7 +109,7 @@ describe('mitService', () => {
           description: 'MIT 2',
           completed: false,
           order: 3,
-          date: '2025-06-27',
+          date: today,
           createdAt: '2025-06-27T00:00:00.000Z',
           updatedAt: '2025-06-27T00:00:00.000Z',
         },
@@ -110,24 +123,20 @@ describe('mitService', () => {
         description: 'New MIT',
         completed: false,
         order: 4, // Should be max order + 1
-        date: '2025-06-27',
+        date: today,
         createdAt: '2025-06-27T00:00:00.000Z',
         updatedAt: '2025-06-27T00:00:00.000Z',
       };
 
       mockReturning.mockResolvedValueOnce([newMit]);
 
-      const result = await mitService.create(
-        'New MIT',
-        undefined,
-        '2025-06-27',
-      );
+      const result = await mitService.create('New MIT', undefined, today);
 
       expect(result[0].order).toBe(4);
       expect(mockValues).toHaveBeenCalledWith({
         description: 'New MIT',
         order: 4,
-        date: '2025-06-27',
+        date: today,
       });
     });
 
@@ -142,6 +151,9 @@ describe('mitService', () => {
     });
 
     it('should throw error when exceeding MAX_MITS_PER_DAY (default 3)', async () => {
+      // Use a future date to avoid past date validation
+      const futureDate = tomorrow;
+
       // Create 3 existing MITs (the default maximum)
       const existingMits: Mit[] = [
         {
@@ -149,7 +161,7 @@ describe('mitService', () => {
           description: 'MIT 1',
           completed: false,
           order: 1,
-          date: '2025-06-27',
+          date: futureDate,
           createdAt: '2025-06-27T00:00:00.000Z',
           updatedAt: '2025-06-27T00:00:00.000Z',
         },
@@ -158,7 +170,7 @@ describe('mitService', () => {
           description: 'MIT 2',
           completed: false,
           order: 2,
-          date: '2025-06-27',
+          date: futureDate,
           createdAt: '2025-06-27T00:00:00.000Z',
           updatedAt: '2025-06-27T00:00:00.000Z',
         },
@@ -167,7 +179,7 @@ describe('mitService', () => {
           description: 'MIT 3',
           completed: false,
           order: 3,
-          date: '2025-06-27',
+          date: futureDate,
           createdAt: '2025-06-27T00:00:00.000Z',
           updatedAt: '2025-06-27T00:00:00.000Z',
         },
@@ -175,9 +187,9 @@ describe('mitService', () => {
 
       mockOrderBy.mockResolvedValueOnce(existingMits);
 
-      await expect(
-        mitService.create('New MIT', 4, '2025-06-27'),
-      ).rejects.toThrow('Cannot create more than 3 MITs per day');
+      await expect(mitService.create('New MIT', 4, futureDate)).rejects.toThrow(
+        `Daily limit of 3 MITs reached for ${futureDate}`,
+      );
     });
   });
 
@@ -189,7 +201,7 @@ describe('mitService', () => {
           description: 'MIT 1',
           completed: false,
           order: 1,
-          date: '2025-06-27',
+          date: today,
           createdAt: '2025-06-27T00:00:00.000Z',
           updatedAt: '2025-06-27T00:00:00.000Z',
         },
@@ -198,7 +210,7 @@ describe('mitService', () => {
           description: 'MIT 2',
           completed: true,
           order: 2,
-          date: '2025-06-27',
+          date: today,
           createdAt: '2025-06-27T00:00:00.000Z',
           updatedAt: '2025-06-27T00:00:00.000Z',
         },
@@ -222,7 +234,7 @@ describe('mitService', () => {
           description: 'MIT for specific date',
           completed: false,
           order: 1,
-          date: '2025-06-28',
+          date: tomorrow,
           createdAt: '2025-06-28T00:00:00.000Z',
           updatedAt: '2025-06-28T00:00:00.000Z',
         },
@@ -230,7 +242,7 @@ describe('mitService', () => {
 
       mockOrderBy.mockResolvedValueOnce(mockMits);
 
-      const result = await mitService.findByDate('2025-06-28');
+      const result = await mitService.findByDate(tomorrow);
 
       expect(result).toEqual(mockMits);
       expect(mockWhere).toHaveBeenCalled();
@@ -239,7 +251,7 @@ describe('mitService', () => {
     it('should return empty array when no MITs found for date', async () => {
       mockOrderBy.mockResolvedValueOnce([]);
 
-      const result = await mitService.findByDate('2025-06-30');
+      const result = await mitService.findByDate(threeDaysAhead);
 
       expect(result).toEqual([]);
     });
@@ -252,7 +264,7 @@ describe('mitService', () => {
         description: 'Updated MIT',
         completed: true,
         order: 1,
-        date: '2025-06-27',
+        date: today,
         createdAt: '2025-06-27T00:00:00.000Z',
         updatedAt: '2025-06-27T10:00:00.000Z',
       };
@@ -289,7 +301,7 @@ describe('mitService', () => {
         description: 'To be deleted',
         completed: false,
         order: 1,
-        date: '2025-06-27',
+        date: today,
         createdAt: '2025-06-27T00:00:00.000Z',
         updatedAt: '2025-06-27T00:00:00.000Z',
       };

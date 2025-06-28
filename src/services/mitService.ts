@@ -34,7 +34,7 @@ export const mitService = {
 
     if (existingMits.length >= MAX_MITS_PER_DAY) {
       throw new Error(
-        `Cannot create more than ${MAX_MITS_PER_DAY} MITs per day. There are already ${existingMits.length} MITs for ${date}.`,
+        `Daily limit of ${MAX_MITS_PER_DAY} MITs reached for ${date}.`,
       );
     }
 
