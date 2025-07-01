@@ -1,15 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import type { Mit } from '../db/schema.js';
+import { getLocalDateString } from '../utils/date.js';
 
 import { mitService } from './mitService.js';
 
 // Helper functions for dynamic dates
-const getToday = () => new Date().toISOString().split('T')[0];
+const getToday = () => getLocalDateString();
 const getFutureDate = (daysAhead = 1) => {
   const date = new Date();
   date.setDate(date.getDate() + daysAhead);
-  return date.toISOString().split('T')[0];
+  return getLocalDateString(date);
 };
 
 // Create properly typed mocks
@@ -143,7 +144,7 @@ describe('mitService', () => {
     it('should throw error when creating MIT for past date', async () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      const pastDate = yesterday.toISOString().split('T')[0];
+      const pastDate = getLocalDateString(yesterday);
 
       await expect(mitService.create('Past MIT', 1, pastDate)).rejects.toThrow(
         'Cannot create MITs for past dates',

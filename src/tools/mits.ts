@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 
 import { mitService } from '../services/mitService.js';
+import { getLocalDateString } from '../utils/date.js';
 
 export function registerMitsTool(server: McpServer) {
   server.registerTool(
@@ -19,7 +20,7 @@ export function registerMitsTool(server: McpServer) {
     async ({ date }) => {
       try {
         // If no date provided, use today's date
-        const targetDate = date || new Date().toISOString().split('T')[0];
+        const targetDate = date || getLocalDateString();
         const mits = await mitService.findByDate(targetDate);
         return {
           content: [{ type: 'text', text: JSON.stringify(mits, null, 2) }],
@@ -55,7 +56,7 @@ export function registerMitsTool(server: McpServer) {
     async ({ description, order, date }) => {
       try {
         // If no date provided, use today's date
-        const targetDate = date || new Date().toISOString().split('T')[0];
+        const targetDate = date || getLocalDateString();
         const [mit] = await mitService.create(description, order, targetDate);
         return {
           content: [{ type: 'text', text: JSON.stringify(mit, null, 2) }],

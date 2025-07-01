@@ -3,6 +3,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { mits } from '../db/schema.js';
 import type { Mit, NewMit } from '../db/schema.js';
+import { getLocalDateString } from '../utils/date.js';
 
 // Get the maximum number of MITs allowed per day from environment variable
 // Default to 3 if not set or invalid
@@ -18,7 +19,7 @@ export const mitService = {
     date: string,
   ): Promise<Mit[]> => {
     // Validate that the date is today or in the future
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateString();
     if (date < today) {
       throw new Error(
         'Cannot create MITs for past dates. Only today or future dates are allowed.',
