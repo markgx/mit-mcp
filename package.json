@@ -1,7 +1,7 @@
 {
   "name": "@markgx/mit-mcp",
   "description": "Manage your most important tasks via an MCP server",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "bugs": {
     "url": "https://github.com/markgx/mit-mcp/issues"
   },
