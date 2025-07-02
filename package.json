@@ -13,6 +13,7 @@
   },
   "files": [
     "dist/",
+    "drizzle/",
     "README.md",
     "LICENSE",
     "package.json"
