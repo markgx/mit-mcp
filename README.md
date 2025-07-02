@@ -50,8 +50,7 @@ List MITs for today or a specific date.
 
 ```json
 {
-  "tool": "list_mits",
-  "parameters": {
+  "arguments": {
     "date": "2024-12-20"
   }
 }
@@ -71,8 +70,7 @@ Create a new MIT for today or a future date.
 
 ```json
 {
-  "tool": "create_mit",
-  "parameters": {
+  "arguments": {
     "description": "Buy kibble for Ace",
     "order": 1
   }
@@ -95,8 +93,7 @@ Update an existing MIT.
 
 ```json
 {
-  "tool": "update_mit",
-  "parameters": {
+  "arguments": {
     "id": "123e4567-e89b-12d3-a456-426614174000",
     "completed": true
   }
@@ -115,8 +112,7 @@ Delete a MIT.
 
 ```json
 {
-  "tool": "delete_mit",
-  "parameters": {
+  "arguments": {
     "id": "123e4567-e89b-12d3-a456-426614174000"
   }
 }
