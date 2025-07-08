@@ -19,15 +19,8 @@ export function registerMitsTool(server: McpServer) {
           .string()
           .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
           .optional(),
-        completed: z
-          .boolean()
-          .optional(),
-        limit: z
-          .number()
-          .int()
-          .min(1)
-          .max(10000)
-          .optional(),
+        completed: z.boolean().optional(),
+        limit: z.number().int().min(1).max(10000).optional(),
       }).shape,
     },
     async ({ startDate, endDate, completed, limit }) => {

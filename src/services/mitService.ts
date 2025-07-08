@@ -59,17 +59,19 @@ export const mitService = {
     return db.select().from(mits).orderBy(mits.order);
   },
 
-  find: async (options: {
-    startDate?: string;
-    endDate?: string;
-    completed?: boolean;
-    limit?: number;
-  } = {}): Promise<Mit[]> => {
+  find: async (
+    options: {
+      startDate?: string;
+      endDate?: string;
+      completed?: boolean;
+      limit?: number;
+    } = {},
+  ): Promise<Mit[]> => {
     const { startDate, endDate, completed, limit = 100 } = options;
 
     // Build where conditions
     const conditions = [];
-    
+
     // If no dates provided, default to today
     if (!startDate && !endDate) {
       conditions.push(eq(mits.date, getLocalDateString()));
@@ -86,18 +88,17 @@ export const mitService = {
         conditions.push(lte(mits.date, endDate));
       }
     }
-    
+
     // Add completed filter if specified
     if (completed !== undefined) {
       conditions.push(eq(mits.completed, completed));
     }
-    
+
     // Build query with all conditions
     const baseQuery = db.select().from(mits);
-    const queryWithConditions = conditions.length > 0 
-      ? baseQuery.where(and(...conditions))
-      : baseQuery;
-    
+    const queryWithConditions =
+      conditions.length > 0 ? baseQuery.where(and(...conditions)) : baseQuery;
+
     // Apply ordering and limit
     return queryWithConditions
       .orderBy(desc(mits.date), asc(mits.order))

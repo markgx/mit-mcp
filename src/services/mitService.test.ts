@@ -238,7 +238,7 @@ describe('mitService', () => {
       mockLimit.mockResolvedValue([]);
     });
 
-    it('should return today\'s MITs when no parameters provided', async () => {
+    it("should return today's MITs when no parameters provided", async () => {
       const mockMits: Mit[] = [
         {
           id: '1',
