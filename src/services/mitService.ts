@@ -105,14 +105,6 @@ export const mitService = {
       .limit(limit);
   },
 
-  findByDate: async (date: string): Promise<Mit[]> => {
-    return db
-      .select()
-      .from(mits)
-      .where(eq(mits.date, date))
-      .orderBy(mits.order);
-  },
-
   update: async (
     id: string,
     data: Partial<Omit<NewMit, 'id'>>,
