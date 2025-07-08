@@ -9,7 +9,7 @@ export function registerMitsTool(server: McpServer) {
     'list_mits',
     {
       title: 'List MITs with flexible date range and filters',
-      description: 'List MITs for today, a date range, or with filters',
+      description: 'List MITs (Most Important Tasks). Returns today\'s MITs by default. Use startDate/endDate for date ranges, completed to filter by status, limit to control results (default 100). Results ordered by date DESC, order ASC.',
       inputSchema: z.object({
         startDate: z
           .string()
@@ -52,7 +52,7 @@ export function registerMitsTool(server: McpServer) {
     'create_mit',
     {
       title: 'Create a new MIT',
-      description: 'Create a new MIT',
+      description: 'Create a new MIT (Most Important Task). Required: description. Optional: order (auto-calculated if omitted), date (defaults to today, must be today or future).',
       inputSchema: z.object({
         description: z.string().min(1, 'Description is required'),
         order: z.number().int().min(1, 'Order must be at least 1').optional(),
@@ -88,7 +88,7 @@ export function registerMitsTool(server: McpServer) {
     'update_mit',
     {
       title: 'Update a MIT',
-      description: 'Update a MIT',
+      description: 'Update an existing MIT by ID. Can modify description, completed status, order, or date.',
       inputSchema: z.object({
         id: z.string().uuid('Invalid MIT ID format'),
         description: z.string().min(1).optional(),
@@ -130,7 +130,7 @@ export function registerMitsTool(server: McpServer) {
     'delete_mit',
     {
       title: 'Delete a MIT',
-      description: 'Delete a MIT',
+      description: 'Delete a MIT by its ID. Returns the deleted MIT details.',
       inputSchema: z.object({
         id: z.string().uuid('Invalid MIT ID format'),
       }).shape,
