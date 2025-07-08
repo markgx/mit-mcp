@@ -8,20 +8,36 @@ export function registerMitsTool(server: McpServer) {
   server.registerTool(
     'list_mits',
     {
-      title: 'List MITs for today or a specific date',
-      description: 'List MITs for today or a specific date',
+      title: 'List MITs with flexible date range and filters',
+      description: 'List MITs for today, a date range, or with filters',
       inputSchema: z.object({
-        date: z
+        startDate: z
           .string()
           .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
           .optional(),
+        endDate: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+          .optional(),
+        completed: z
+          .boolean()
+          .optional(),
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(10000)
+          .optional(),
       }).shape,
     },
-    async ({ date }) => {
+    async ({ startDate, endDate, completed, limit }) => {
       try {
-        // If no date provided, use today's date
-        const targetDate = date || getLocalDateString();
-        const mits = await mitService.findByDate(targetDate);
+        const mits = await mitService.find({
+          startDate,
+          endDate,
+          completed,
+          limit,
+        });
         return {
           content: [{ type: 'text', text: JSON.stringify(mits, null, 2) }],
         };

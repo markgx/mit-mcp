@@ -20,6 +20,7 @@ const mockWhere = vi.fn();
 const mockOrderBy = vi.fn();
 const mockSet = vi.fn();
 const mockReturning = vi.fn();
+const mockLimit = vi.fn();
 
 // Mock the database module
 vi.mock('../db/index.js', () => ({
@@ -49,7 +50,6 @@ describe('mitService', () => {
   // Calculate dates once for all tests
   const today = getToday();
   const tomorrow = getFutureDate();
-  const threeDaysAhead = getFutureDate(3);
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -61,9 +61,10 @@ describe('mitService', () => {
       orderBy: mockOrderBy,
       returning: mockReturning,
     });
-    mockOrderBy.mockReturnValue({ returning: mockReturning });
+    mockOrderBy.mockReturnValue({ returning: mockReturning, limit: mockLimit });
     mockValues.mockReturnValue({ returning: mockReturning });
     mockSet.mockReturnValue({ where: mockWhere, returning: mockReturning });
+    mockLimit.mockReturnValue([]);
   });
 
   describe('create', () => {
@@ -227,12 +228,52 @@ describe('mitService', () => {
     });
   });
 
-  describe('findByDate', () => {
-    it('should return MITs for specific date', async () => {
+  describe('find', () => {
+    // Add mock for limit
+    const mockLimit = vi.fn();
+
+    beforeEach(() => {
+      // Update mock chain to include limit
+      mockOrderBy.mockReturnValue({ limit: mockLimit });
+      mockLimit.mockResolvedValue([]);
+    });
+
+    it('should return today\'s MITs when no parameters provided', async () => {
       const mockMits: Mit[] = [
         {
           id: '1',
-          description: 'MIT for specific date',
+          description: 'Today MIT',
+          completed: false,
+          order: 1,
+          date: today,
+          createdAt: '2025-06-27T00:00:00.000Z',
+          updatedAt: '2025-06-27T00:00:00.000Z',
+        },
+      ];
+
+      mockLimit.mockResolvedValueOnce(mockMits);
+
+      const result = await mitService.find();
+
+      expect(result).toEqual(mockMits);
+      expect(mockWhere).toHaveBeenCalled();
+      expect(mockLimit).toHaveBeenCalledWith(100); // default limit
+    });
+
+    it('should return MITs within date range', async () => {
+      const mockMits: Mit[] = [
+        {
+          id: '1',
+          description: 'MIT 1',
+          completed: false,
+          order: 1,
+          date: today,
+          createdAt: '2025-06-27T00:00:00.000Z',
+          updatedAt: '2025-06-27T00:00:00.000Z',
+        },
+        {
+          id: '2',
+          description: 'MIT 2',
           completed: false,
           order: 1,
           date: tomorrow,
@@ -241,20 +282,64 @@ describe('mitService', () => {
         },
       ];
 
-      mockOrderBy.mockResolvedValueOnce(mockMits);
+      mockLimit.mockResolvedValueOnce(mockMits);
 
-      const result = await mitService.findByDate(tomorrow);
+      const result = await mitService.find({
+        startDate: today,
+        endDate: tomorrow,
+      });
 
       expect(result).toEqual(mockMits);
       expect(mockWhere).toHaveBeenCalled();
     });
 
-    it('should return empty array when no MITs found for date', async () => {
-      mockOrderBy.mockResolvedValueOnce([]);
+    it('should filter by completed status', async () => {
+      const mockMits: Mit[] = [
+        {
+          id: '1',
+          description: 'Incomplete MIT',
+          completed: false,
+          order: 1,
+          date: today,
+          createdAt: '2025-06-27T00:00:00.000Z',
+          updatedAt: '2025-06-27T00:00:00.000Z',
+        },
+      ];
 
-      const result = await mitService.findByDate(threeDaysAhead);
+      mockLimit.mockResolvedValueOnce(mockMits);
 
-      expect(result).toEqual([]);
+      const result = await mitService.find({ completed: false });
+
+      expect(result).toEqual(mockMits);
+      expect(mockWhere).toHaveBeenCalled();
+    });
+
+    it('should respect custom limit', async () => {
+      mockLimit.mockResolvedValueOnce([]);
+
+      await mitService.find({ limit: 50 });
+
+      expect(mockLimit).toHaveBeenCalledWith(50);
+    });
+
+    it('should handle startDate only', async () => {
+      const mockMits: Mit[] = [];
+      mockLimit.mockResolvedValueOnce(mockMits);
+
+      const result = await mitService.find({ startDate: tomorrow });
+
+      expect(result).toEqual(mockMits);
+      expect(mockWhere).toHaveBeenCalled();
+    });
+
+    it('should handle endDate only', async () => {
+      const mockMits: Mit[] = [];
+      mockLimit.mockResolvedValueOnce(mockMits);
+
+      const result = await mitService.find({ endDate: tomorrow });
+
+      expect(result).toEqual(mockMits);
+      expect(mockWhere).toHaveBeenCalled();
     });
   });
 
