@@ -8,20 +8,30 @@ export function registerMitsTool(server: McpServer) {
   server.registerTool(
     'list_mits',
     {
-      title: 'List MITs for today or a specific date',
-      description: 'List MITs for today or a specific date',
+      title: 'List MITs with flexible date range and filters',
+      description:
+        "List MITs (Most Important Tasks). Returns today's MITs by default. Use startDate/endDate for date ranges, completed to filter by status, limit to control results (default 100). Results ordered by date DESC, order ASC.",
       inputSchema: z.object({
-        date: z
+        startDate: z
           .string()
           .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
           .optional(),
+        endDate: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format')
+          .optional(),
+        completed: z.boolean().optional(),
+        limit: z.number().int().min(1).max(10000).optional(),
       }).shape,
     },
-    async ({ date }) => {
+    async ({ startDate, endDate, completed, limit }) => {
       try {
-        // If no date provided, use today's date
-        const targetDate = date || getLocalDateString();
-        const mits = await mitService.findByDate(targetDate);
+        const mits = await mitService.find({
+          startDate,
+          endDate,
+          completed,
+          limit,
+        });
         return {
           content: [{ type: 'text', text: JSON.stringify(mits, null, 2) }],
         };
@@ -43,7 +53,8 @@ export function registerMitsTool(server: McpServer) {
     'create_mit',
     {
       title: 'Create a new MIT',
-      description: 'Create a new MIT',
+      description:
+        'Create a new MIT (Most Important Task). Required: description. Optional: order (auto-calculated if omitted), date (defaults to today, must be today or future).',
       inputSchema: z.object({
         description: z.string().min(1, 'Description is required'),
         order: z.number().int().min(1, 'Order must be at least 1').optional(),
@@ -79,7 +90,8 @@ export function registerMitsTool(server: McpServer) {
     'update_mit',
     {
       title: 'Update a MIT',
-      description: 'Update a MIT',
+      description:
+        'Update an existing MIT by ID. Can modify description, completed status, order, or date.',
       inputSchema: z.object({
         id: z.string().uuid('Invalid MIT ID format'),
         description: z.string().min(1).optional(),
@@ -121,7 +133,7 @@ export function registerMitsTool(server: McpServer) {
     'delete_mit',
     {
       title: 'Delete a MIT',
-      description: 'Delete a MIT',
+      description: 'Delete a MIT by its ID. Returns the deleted MIT details.',
       inputSchema: z.object({
         id: z.string().uuid('Invalid MIT ID format'),
       }).shape,
