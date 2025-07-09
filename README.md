@@ -40,18 +40,35 @@ Add to your MCP client configuration (e.g., Claude Desktop):
 
 ### `list_mits`
 
-List MITs for today or a specific date.
+List MITs with flexible date range and filters.
 
 **Parameters:**
 
-- `date` (optional): Date in YYYY-MM-DD format (defaults to today)
+- `startDate` (optional): Start of date range in YYYY-MM-DD format
+- `endDate` (optional): End of date range in YYYY-MM-DD format
+- `completed` (optional): Filter by completion status (true/false)
+- `limit` (optional): Maximum number of results (1-10000, defaults to 100)
 
-**Example:**
+**Notes:**
+
+- When no dates are provided, returns today's MITs
+- Results are ordered by date DESC, then order ASC
+
+**Examples:**
 
 ```json
+// Get MITs for a specific date range
 {
   "arguments": {
-    "date": "2024-12-20"
+    "startDate": "2024-12-01",
+    "endDate": "2024-12-31"
+  }
+}
+
+// Get completed MITs for today
+{
+  "arguments": {
+    "completed": true
   }
 }
 ```
